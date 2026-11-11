@@ -498,7 +498,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 // =====================================================================
 // Conexão com o servidor (Apps Script ou GitHub Pages)
 // =====================================================================
-const API_ID = 'AKfycbwIt6oRzofjPZSY6jUc081JX7o8FrZ1HC_n88CcpXjq2Bc7fP_QItYbaN0tL09IIPYTPA';  // muda só se criar uma NOVA implantação
+const API_ID = 'AKfycbzsQt0C39R--5705vnMxn1NE-6WpCVcbCxYsQi8r61NdfQReO47pKGqQn2bPMUGrfeM9Q';  // muda só se criar uma NOVA implantação
 const DENTRO_DO_GOOGLE = !!(window.google && google.script && google.script.run);
 const API_URL = window.CM_API_URL || ('https:' + '/' + '/script.google.com/macros/s/' + API_ID + '/exec');
 
@@ -3836,7 +3836,8 @@ function freteFormHtml() {
         const m = i.tag ? IDX.maq[i.tag] : null;
         return '<div class="li">' + (i.tipo === 'Máquina' && i.tag ? '<span class="tag">' + esc(i.tag) + '</span><div class="grow t">' + esc(m ? m.tipo : '') + '</div>' :
           i.tipo === 'Máquina' ? '<span class="chip info">Máquina</span><input class="input grow" data-in="ffItem" data-arg="' + k + ':descricao" value="' + esc(i.descricao) + '" placeholder="Descrição / contrato">' :
-          '<span class="chip">' + (ff.tipoFrete === 'Combustível' ? 'Comb.' : 'Material') + '</span><input class="input grow" data-in="ffItem" data-arg="' + k + ':descricao" value="' + esc(i.descricao) + '" placeholder="' + (ff.tipoFrete === 'Combustível' ? 'Ex.: diesel S10' : 'Ex.: cimento CP-II') + '">' +
+          '<span class="chip">' + (ff.tipoFrete === 'Combustível' ? 'Comb.' : 'Material') + '</span>' +
+            (ff.tipoFrete === 'Almoxarifado' && EST ? matSelect(k, i.matId) : '<input class="input grow" data-in="ffItem" data-arg="' + k + ':descricao" value="' + esc(i.descricao) + '" placeholder="' + (ff.tipoFrete === 'Combustível' ? 'Ex.: diesel S10' : 'Ex.: cimento CP-II') + '">') +
             '<input class="input" style="width:80px" data-in="ffItem" data-arg="' + k + ':qtd" value="' + esc(i.qtd) + '" inputmode="decimal" aria-label="Quantidade"><input class="input" style="width:70px" data-in="ffItem" data-arg="' + k + ':unidade" value="' + esc(i.unidade) + '" aria-label="Unidade">') +
           '<button class="btn ghost icon" data-act="ffTirar" data-arg="' + k + '" aria-label="Tirar">' + ic('x') + '</button></div>';
       }).join('') + '</div></div>' : '') + '</div>' +
@@ -3849,6 +3850,14 @@ function freteFormHtml() {
     '<div class="grid2"><label class="field"><span>Solicitado por</span><input class="input" data-in="ff" data-arg="solicitadoPor" value="' + esc(ff.solicitadoPor) + '"></label>' +
       '<label class="field"><span>Referência (OS, solicitação, pedido)</span><input class="input" data-in="ff" data-arg="referencia" value="' + esc(ff.referencia) + '"></label></div>' +
     '<label class="field"><span>Observação</span><textarea class="input" data-in="ff" data-arg="obs" placeholder="Ex.: falar com o almoxarife; precisa de munck">' + esc(ff.obs) + '</textarea></label></div>';
+}
+// Seletor de material do estoque (almoxarifado): lista ativos com o disponível; usados aparecem como "(usado)"
+function matSelect(k, atual) {
+  const mats = EST.materiais.filter(function (m) { return m.ativo !== false; });
+  return '<select class="input grow" data-in="ffMat" data-arg="' + k + '" aria-label="Material do estoque">' +
+    '<option value="">Escolha o material…</option>' + mats.map(function (m) {
+      return '<option value="' + esc(m.id) + '"' + (String(atual) === String(m.id) ? ' selected' : '') + '>' + esc(nomeMat(m)) + ' · ' + esc(m.c) + ' · disponível ' + m.disp + ' ' + esc(m.u) + '</option>';
+    }).join('') + '</select>';
 }
 function redesenharFF() { const b = document.getElementById('ff-body'); if (b) b.innerHTML = freteFormHtml(); }
 SCAN.frm = function (tag, input) {
@@ -3873,7 +3882,8 @@ ACT.ffEnviar = function () {
   if (!ff.origem.id && !(ff.origem.texto || '').trim()) return toast('Informe a origem do frete.', 'warn');
   if (!ff.destino.id && !(ff.destino.texto || '').trim()) return toast('Informe o destino do frete.', 'warn');
   if (ff.prioridade === 'Agendado' && !ff.data) return toast('Informe a data agendada.', 'warn');
-  const d = { itens: ff.itens.map(function (i) { return { tipo: i.tipo, tag: i.tag, descricao: i.descricao, qtd: numBR(i.qtd) || 1, unidade: i.unidade }; }),
+  if (ff.tipoFrete === 'Almoxarifado' && ff.itens.some(function (i) { return i.tipo === 'Material' && !i.matId; })) return toast('Escolha o material de cada linha.', 'warn');
+  const d = { itens: ff.itens.map(function (i) { return { tipo: i.tipo, tag: i.tag, matId: i.matId || '', descricao: i.descricao, qtd: numBR(i.qtd) || 1, unidade: i.unidade }; }),
     origem: ff.origem.id ? { id: ff.origem.id } : { texto: ff.origem.texto }, destino: ff.destino.id ? { id: ff.destino.id } : { texto: ff.destino.texto },
     tipoFrete: ff.tipoFrete, prioridade: ff.prioridade, data: ff.data, dia: ff.dia, obs: ff.obs, solicitadoPor: ff.solicitadoPor, referencia: ff.referencia };
   chamar('criarFrete', [TOKEN, d]).then(function (r) {
@@ -4986,6 +4996,7 @@ function inputMudou(el, change) {
   if (k === 'cand') { UI.cand.q = el.value; clearTimeout(tBusca); tBusca = setTimeout(redesenharCand, 180); return; }
   if (k === 'ff') { UI.ff[a] = el.value; return; }
   if (k === 'ffItem') { const p = a.split(':'); if (UI.ff.itens[+p[0]]) UI.ff.itens[+p[0]][p[1]] = el.value; return; }
+  if (k === 'ffMat') { const it = UI.ff.itens[+a]; if (!it) return; const m = matDe(el.value); it.matId = m ? m.id : ''; it.descricao = m ? nomeMat(m) : ''; it.unidade = m ? m.u : 'un'; if (change) redesenharFF(); return; }
   if (k === 'ffPonto') { if (!change) return; UI.ff[a] = el.value === '@outro' ? { texto: '' } : el.value ? { id: el.value } : {}; redesenharFF(); return; }
   if (k === 'ffTexto') { UI.ff[a] = { texto: el.value }; return; }
   if (k === 'tpQ') { UI.tpQ = el.value; clearTimeout(tBusca); tBusca = setTimeout(function () { const pos = el.selectionStart; render(); const n = document.querySelector('[data-in="tpQ"]'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) { } } }, 180); return; }

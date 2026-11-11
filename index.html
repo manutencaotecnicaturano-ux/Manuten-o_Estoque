@@ -374,6 +374,7 @@ body.sem-barra .rede{bottom:calc(16px + env(safe-area-inset-bottom))}
 .qd-h b{font-size:14px}.qd-h b.click{cursor:pointer;border-bottom:1px dashed var(--line-2)}
 .qd-d{margin-left:auto}
 .qd-a{gap:6px;margin:0 0 8px}
+.qd-t{display:flex;align-items:center;gap:5px;margin:-2px 0 8px}
 .qd-b{display:flex;flex-direction:column;gap:8px}
 .quadros.dias .qd-b{max-height:52vh;overflow-y:auto;padding:2px;margin:-2px}
 @media (max-width:640px){.quadros{grid-auto-columns:82%}.quadros.dias .qd-b{max-height:none}}
@@ -436,6 +437,11 @@ label.li.check{cursor:pointer}
 label.li.check input{margin-top:0}
 details>summary{list-style:revert}
 @media (max-width:640px){.li2{flex-wrap:wrap;row-gap:6px}.li2>.grow{flex-basis:calc(100% - 40px)}.li2>.chips{width:100%;padding-left:40px;justify-content:flex-start!important}}
+.so-cel{display:none}
+.car-li .t{white-space:normal}
+@media (max-width:640px){.car-li{flex-wrap:wrap}.car-li .grow{flex-basis:calc(100% - 44px)}.car-li .car-q{margin-left:34px}}
+@media (max-width:640px){.so-desk{display:none}.so-cel{display:block}.so-cel .li{flex-wrap:wrap}.so-cel .li .acoes{flex-basis:100%;display:flex;justify-content:flex-end}}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 </style>
 </head>
 <body>
@@ -498,7 +504,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 // =====================================================================
 // Conexão com o servidor (Apps Script ou GitHub Pages)
 // =====================================================================
-const API_ID = 'AKfycbwIt6oRzofjPZSY6jUc081JX7o8FrZ1HC_n88CcpXjq2Bc7fP_QItYbaN0tL09IIPYTPA';  // muda só se criar uma NOVA implantação
+const API_ID = 'AKfycbzsQt0C39R--5705vnMxn1NE-6WpCVcbCxYsQi8r61NdfQReO47pKGqQn2bPMUGrfeM9Q';  // muda só se criar uma NOVA implantação
 const DENTRO_DO_GOOGLE = !!(window.google && google.script && google.script.run);
 const API_URL = window.CM_API_URL || ('https:' + '/' + '/script.google.com/macros/s/' + API_ID + '/exec');
 
@@ -527,6 +533,7 @@ if (!DENTRO_DO_GOOGLE) {
 // Ícones
 // =====================================================================
 const IC = {
+  cart: '<path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6.2"/><circle cx="9.5" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/>',
   home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
   send: '<path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>',
   inbox: '<path d="M4 13h4l1.5 3h5L16 13h4"/><path d="M5.5 5h13L20 13v6H4v-6z"/><path d="M12 3v7"/><path d="m9 7.5 3 3 3-3"/>',
@@ -1082,13 +1089,13 @@ const MODULOS = [
     ['inventario', 'Inventário', 'inv', 'inventario'], ['alertas', 'Alertas', 'alert', '@adm']] },
   { id: 'hist', nome: 'Histórico de manutenção', ic: 'search', telas: [['historico', 'Histórico', 'search']] },
   { id: 'mov', nome: 'Frete', ic: 'send', telas: [['fretes', 'Fretes', 'send', '@mov'], ['receber', 'Receber frete', 'inbox', 'receber']] },
-  { id: 'est', nome: 'Estoque', ic: 'inbox', telas: [['estPedidos', 'Pedidos de material', 'list', '@mat'], ['estSaldo', 'Estoque', 'box', '@mat'], ['estMov', 'Movimentações', 'chart', 'matGerir'], ['estForn', 'Fornecedores', 'building', 'matGerir']] },
+  { id: 'est', nome: 'Estoque', ic: 'inbox', telas: [['estPedidos', 'Pedidos de material', 'list', '@mat'], ['estSaldo', 'Estoque', 'box', '@mat'], ['estCarrinho', 'Carrinho', 'cart', '@mat'], ['estMov', 'Movimentações', 'chart', 'matGerir'], ['estForn', 'Fornecedores', 'building', 'matGerir']] },
   { id: 'cad', nome: 'Cadastros', ic: 'folder', telas: [['maquinas', 'Máquinas', 'box', 'cadMaquinas'], ['tipos', 'Tipos de máquina', 'grid', 'cadMaquinas'], ['locais', 'Obras e locais', 'pin', 'cadLocais'],
     ['veiculos', 'Veículos', 'car', 'cadVeiculos'], ['usuarios', 'Usuários', 'users', 'usuarios'], ['importar', 'Importar planilhas', 'doc', 'cadMaquinas']] },
   { id: 'gestao', nome: 'Gestão', ic: 'chart', breve: true }
 ];
 const ROTULO_CURTO = { solNova: 'Nova', solicitacoes: 'Pedidos', os: 'OS', locacoes: 'Locações', obras: 'Obras', maquinas: 'Máquinas', preventivas: 'Preventiva',
-  inventario: 'Inventário', alertas: 'Alertas', historico: 'Histórico', fretes: 'Fretes', receber: 'Receber', estPedidos: 'Pedidos', estSaldo: 'Estoque', importar: 'Importar', estMov: 'Movim.', estForn: 'Fornec.', tipos: 'Tipos', locais: 'Locais', veiculos: 'Veículos', usuarios: 'Usuários' };
+  inventario: 'Inventário', alertas: 'Alertas', historico: 'Histórico', fretes: 'Fretes', receber: 'Receber', estPedidos: 'Pedidos', estSaldo: 'Estoque', estCarrinho: 'Carrinho', importar: 'Importar', estMov: 'Movim.', estForn: 'Fornec.', tipos: 'Tipos', locais: 'Locais', veiculos: 'Veículos', usuarios: 'Usuários' };
 function ehObra() { return !!(S && S.usuario.obra); }
 function modulo(id) {
   const m = MODULOS.find(function (x) { return x.id === id; }) || null;
@@ -1121,7 +1128,7 @@ function contLoc() { return pode('locGerir') || pode('solAprovar') || ehObra() ?
 function contFretes() { return FRT && FRT.fretes && pode('freteGerir') ? FRT.fretes.filter(function (f) { return f.status === 'Aguardando aprovação' || (f.status === 'Entregue parcial' && !f.decisaoParcial); }).length : 0; }
 function contReceber() { return FRT && FRT.fretes && pode('receber') && ehObra() ? paraReceber().length : 0; }
 function badgeNav(v) {
-  const n = { alertas: [contAlertas(), ''], solicitacoes: [contSol(), '#c98a12'], os: [contOS(), 'var(--info)'], locacoes: [contLoc(), ''], fretes: [contFretes(), 'var(--info)'], receber: [contReceber(), 'var(--info)'], estPedidos: [contEst(), '#c98a12'] }[v];
+  const n = { alertas: [contAlertas(), ''], solicitacoes: [contSol(), '#c98a12'], os: [contOS(), 'var(--info)'], locacoes: [contLoc(), ''], fretes: [contFretes(), 'var(--info)'], receber: [contReceber(), 'var(--info)'], estPedidos: [contEst(), '#c98a12'], estCarrinho: [estAcesso() ? carrinho().length : 0, 'var(--info)'] }[v];
   return n && n[0] ? '<span class="badge"' + (n[1] ? ' style="background:' + n[1] + '"' : '') + '>' + n[0] + '</span>' : '';
 }
 // Número no quadrado do módulo: o que pede ação de quem está logado
@@ -3358,7 +3365,9 @@ function telaFreteGestor() {
     const prontos = lista.filter(function (f) { return f.status === FR_ST.AP; }).length;
     return '<div class="qd carga" data-quadro="carga:' + esc(c.id) + '"><div class="qd-h"><b class="click" data-act="cgRenomear" data-arg="' + esc(c.id) + '" title="Renomear">' + esc(c.nome) + '</b><span class="chip">' + lista.length + '</span>' +
       (c.saiuEm ? '<span class="chip accent">Saiu ' + fmtD(c.saiuEm).slice(0, 5) + '</span>' : '') + '</div>' +
+      '<div class="small ' + (c.veiculo ? 'muted' : 'faint') + ' qd-t">' + ic('car', 'ic-sm') + ' ' + esc(c.veiculo ? descTransp(c, true) : 'Sem veículo definido') + '</div>' +
       '<div class="row wrap qd-a">' +
+        (!c.saiuEm ? '<button class="btn sm ghost" data-act="cgTransp" data-arg="' + esc(c.id) + '">' + (c.veiculo ? 'Transporte' : 'Definir veículo') + '</button>' : '') +
         (semRom ? '<button class="btn sm primary" data-act="cgRomaneios" data-arg="' + esc(c.id) + '">' + ic('doc', 'ic-sm') + 'Gerar romaneios (' + semRom + ')</button>' : '') +
         (comRom ? '<button class="btn sm" data-act="cgImprimir" data-arg="' + esc(c.id) + '">' + ic('print', 'ic-sm') + 'Imprimir</button>' : '') +
         (prontos && !semRom ? '<button class="btn sm" data-act="cgSaiu" data-arg="' + esc(c.id) + '">' + ic('send', 'ic-sm') + 'Saiu</button>' : '') +
@@ -3498,7 +3507,7 @@ function abrirFrete(id) {
       '<div><span>' + (f.prioridade === 'Agendado' ? 'Data agendada' : 'Prazo') + '</span><b>' + fmtD(f.prioridade === 'Agendado' ? f.dataAgendada : f.prazo) + '</b></div>' +
       (f.dia ? '<div><span>Dia do frete</span><b>' + fmtD(f.dia) + '</b></div>' : '') +
       (f.carga ? '<div><span>Carga</span><b>' + esc((FRT.cargas.find(function (c) { return c.id === f.carga; }) || { nome: f.carga }).nome) + '</b></div>' : '') +
-      (f.motorista || f.veiculo ? '<div><span>Saída</span><b>' + esc([f.motorista, f.veiculo].filter(Boolean).join(' · ')) + '</b> <span class="small faint">' + fmtD(f.saiuEm) + '</span></div>' : '') +
+      (f.motorista || f.veiculo || (g && f.valor !== '' && f.valor != null) ? '<div><span>Transporte</span><b>' + esc(descTransp(f, g)) + '</b>' + (f.saiuEm ? ' <span class="small faint">saiu ' + fmtD(f.saiuEm) + '</span>' : '') + '</div>' : '') +
       (f.entregueEm ? '<div><span>Recebido</span><b>' + esc(f.recebedor || f.recebidoPor) + '</b> <span class="small faint">' + fmtD(f.entregueEm) + '</span></div>' : '') +
       (f.referencia ? '<div><span>Referência</span><b>' + esc(f.referencia) + '</b></div>' : '') + '</div>' +
     (f.obs ? '<div class="box-txt" style="margin-bottom:14px">' + esc(f.obs) + '</div>' : '') +
@@ -3522,6 +3531,7 @@ function abrirFrete(id) {
     if (!f.romaneio) b.push('<button class="btn" data-act="frRomaneio" data-arg="' + esc(f.id) + '">' + ic('doc') + 'Gerar romaneio</button>');
     if (!f.romaneio) b.push('<button class="btn ghost" data-act="frDesfazer" data-arg="' + esc(f.id) + '">Desfazer aprovação</button>');
   }
+  if (g && [FR_ST.AG, FR_ST.AP, FR_ST.ROTA].indexOf(f.status) >= 0) b.push('<button class="btn" data-act="frTransp" data-arg="' + esc(f.id) + '">' + ic('car') + (f.veiculo ? 'Transporte' : 'Definir veículo') + '</button>');
   if (f.romaneio && [FR_ST.AP, FR_ST.ROTA].indexOf(f.status) >= 0 && g) b.push('<button class="btn" data-act="frImprimir" data-arg="' + esc(f.id) + '">' + ic('print') + 'Imprimir romaneio</button>');
   if (g && [FR_ST.AP, FR_ST.ROTA].indexOf(f.status) >= 0 && !(f.romaneio && IDX.loc[f.destino] && IDX.loc[f.destino].tipo === 'Obra')) b.push('<button class="btn" data-act="frEntregue" data-arg="' + esc(f.id) + '">' + ic('check') + 'Marcar entregue</button>');
   if (pode('receber') && f.romaneio && [FR_ST.AP, FR_ST.ROTA].indexOf(f.status) >= 0 && !f._recebPend && (g || f.destino === S.usuario.obra)) b.push('<button class="btn primary" data-act="rcAbrir" data-arg="' + esc(f.romaneio) + '">' + ic('inbox') + 'Receber</button>');
@@ -3534,6 +3544,62 @@ function abrirFrete(id) {
   modal({ title: '<span class="mono">' + esc(f.id) + '</span> · ' + esc(f.tipoFrete), sub: esc(itensFrete(f)), wide: true, body: corpo + (recebido ? '' : ''),
     foot: b.length ? '<div class="row wrap" style="gap:8px;justify-content:flex-end;width:100%">' + b.join('') + '</div>' : '<button class="btn" data-act="fecharModal">Fechar</button>' });
 }
+// ---------- Transporte: veículo da frota ou terceiro, motorista e valor ----------
+function veiculosAtivos() { return (S.veiculos || []).filter(function (v) { return !/inativ|baixad|vendid/i.test(v.situacao || ''); }); }
+function nomeVeic(veiculo, transportadora) {
+  if (!veiculo) return '';
+  if (veiculo === 'Terceiro') return 'Terceiro' + (transportadora ? ': ' + transportadora : '');
+  const cod = String(veiculo).split(' · ')[0];
+  const v = (S.veiculos || []).find(function (x) { return x.codigo === cod; });
+  return v ? v.codigo + (v.marcaModelo ? ' · ' + v.marcaModelo : '') : String(veiculo);
+}
+function descTransp(t, comValor) {
+  return [nomeVeic(t.veiculo, t.transportadora), t.motorista, comValor && t.valor !== '' && t.valor != null ? fmtR(t.valor) : ''].filter(Boolean).join(' · ');
+}
+// p = prefixo dos ids; bind = data-in do formulário que se redesenha (Novo frete)
+function camposTransp(t, p, bind) {
+  t = t || {};
+  const at = function (c) { return ' id="' + p + '-' + c + '"' + (bind ? ' data-in="' + bind + '" data-arg="' + c + '"' : ''); };
+  const terc = t.veiculo === 'Terceiro';
+  const ops = veiculosAtivos().map(function (v) { return { v: v.codigo, t: v.codigo + (v.marcaModelo ? ' · ' + v.marcaModelo : '') }; });
+  const atual = t.veiculo && t.veiculo !== 'Terceiro' ? String(t.veiculo).split(' · ')[0] : t.veiculo || '';
+  return '<div class="stack"><div class="grid2"><label class="field"><span>Veículo</span><select class="input"' + at('veiculo') + '>' + sel(ops.concat([{ v: 'Terceiro', t: 'Terceiro (fora da frota)' }]), atual, 'Escolha') + '</select></label>' +
+      '<label class="field" id="' + p + '-terc-box"' + (terc ? '' : ' hidden') + '><span>Transportadora / dono do veículo</span><input class="input"' + at('transportadora') + ' value="' + esc(t.transportadora || '') + '" placeholder="Ex.: Transportes Silva"></label></div>' +
+    '<div class="grid2"><label class="field"><span>Motorista</span><input class="input"' + at('motorista') + ' value="' + esc(t.motorista || '') + '" placeholder="Nome de quem leva"></label>' +
+      '<label class="field"><span>Valor do frete (R$)</span><input class="input" inputmode="decimal"' + at('valor') + ' value="' + esc(t.valor === '' || t.valor == null ? '' : String(t.valor).replace('.', ',')) + '" placeholder="Em branco se não houver custo"></label></div></div>';
+}
+function ligarTransp(p) {
+  const v = document.getElementById(p + '-veiculo');
+  if (v) v.onchange = function () { const b = document.getElementById(p + '-terc-box'); if (b) b.hidden = v.value !== 'Terceiro'; if (v.value === 'Terceiro') { const i = document.getElementById(p + '-transportadora'); if (i) i.focus(); } };
+}
+function lerTransp(p, exigir) {
+  const g = function (c) { const e = document.getElementById(p + '-' + c); return e ? e.value.trim() : ''; };
+  const t = { veiculo: g('veiculo'), transportadora: g('transportadora'), motorista: g('motorista'), valor: g('valor') };
+  if (exigir && !t.veiculo) { toast('Escolha o veículo (da frota ou terceiro).', 'warn'); return null; }
+  if (t.veiculo === 'Terceiro' && t.transportadora.length < 2) { toast('Informe a transportadora ou o dono do veículo terceiro.', 'warn'); return null; }
+  if (t.veiculo !== 'Terceiro') t.transportadora = '';
+  if (t.valor !== '') { const n = numBR(t.valor); if (n === '' || isNaN(n) || n < 0) { toast('Valor do frete inválido.', 'warn'); return null; } t.valor = n; }
+  return t;
+}
+function modalTransp(titulo, sub, t, botao, enviar) {
+  modal({ title: titulo, sub: sub, body: camposTransp(t, 'tp'),
+    foot: '<button class="btn" data-act="fecharModal">Cancelar</button><button class="btn primary" id="tp-ok">' + ic('car') + esc(botao) + '</button>' });
+  ligarTransp('tp');
+  document.getElementById('tp-ok').onclick = function () { const x = lerTransp('tp', true); if (x) enviar(x); };
+}
+ACT.frTransp = function (el) {
+  const f = freteDe(el.dataset.arg);
+  modalTransp('Transporte do frete ' + esc(f.id), esc(f.origemNome) + ' → ' + esc(f.destinoNome) + (f.carga ? ' · está numa carga: na saída vale o transporte da carga, e o valor fica na carga' : ''), f, 'Salvar transporte', function (t) {
+    acaoFreteTela('decidirFrete', [TOKEN, f.id, 'transporte', t], 'Transporte salvo.').catch(function () { });
+  });
+};
+ACT.cgTransp = function (el) {
+  const c = FRT.cargas.find(function (x) { return x.id === el.dataset.arg; });
+  modalTransp('Transporte da carga', esc(c.nome) + ' · vale para todos os fretes da carga', c, 'Salvar transporte', function (t) {
+    acaoFreteTela('acaoCarga', [TOKEN, 'transporte', Object.assign({ id: c.id }, t)], 'Transporte da carga salvo.').catch(function () { });
+  });
+};
+
 function opcoesDia(atual) {
   const ops = [[diaLocal(0), 'Hoje'], [diaLocal(1), 'Amanhã'], [diaLocal(2), 'Depois de amanhã']];
   for (let k = 3; k <= 10; k++) { const d = diaLocal(k); ops.push([d, new Date(d + 'T12:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' })]); }
@@ -3583,6 +3649,11 @@ ACT.frParcial = function (el) {
   });
 };
 ACT.frRomaneio = function (el) {
+  const f = freteDe(el.dataset.arg);
+  // o romaneio sai com o veículo: se o frete ainda não tem, pede antes de gerar
+  if (f && !f.veiculo) return modalTransp('Transporte do frete ' + esc(f.id), 'O veículo vai impresso no romaneio', f, 'Salvar e gerar romaneio', function (t) {
+    chamar('decidirFrete', [TOKEN, f.id, 'transporte', t]).then(function (r) { aplicarFrete(r.frt); ACT.frRomaneio({ dataset: { arg: f.id } }); }).catch(function () { });
+  });
   chamar('gerarRomaneios', [TOKEN, { fretes: [el.dataset.arg] }]).then(function (r) { fecharModal(); aplicarFrete(r.frt); imprimirRomaneios(r.romaneios.map(freteDoRomaneio).filter(Boolean)); }).catch(function () { });
 };
 ACT.frImprimir = function (el) { imprimirRomaneios([freteDe(el.dataset.arg)]); };
@@ -3605,6 +3676,11 @@ ACT.cgRenomear = function (el) {
 ACT.cgArquivar = function (el) { acaoFreteTela('acaoCarga', [TOKEN, 'arquivar', { id: el.dataset.arg }], 'Carga arquivada.').catch(function () { }); };
 ACT.cgRomaneios = function (el) {
   const id = el.dataset.arg;
+  const c = FRT.cargas.find(function (x) { return x.id === id; });
+  // o romaneio sai com o veículo: se a carga ainda não tem, pede antes de gerar
+  if (c && !c.veiculo) return modalTransp('Transporte da carga', esc(c.nome) + ' · o veículo vai impresso nos romaneios', c, 'Salvar e gerar romaneios', function (t) {
+    chamar('acaoCarga', [TOKEN, 'transporte', Object.assign({ id: id }, t)]).then(function (r) { fecharModal(); aplicarFrete(r.frt); ACT.cgRomaneios({ dataset: { arg: id } }); }).catch(function () { });
+  });
   chamar('gerarRomaneios', [TOKEN, { carga: id }]).then(function (r) {
     aplicarFrete(r.frt);
     toast(plural(r.novos.length, 'romaneio gerado', 'romaneios gerados') + '.');
@@ -3614,13 +3690,12 @@ ACT.cgRomaneios = function (el) {
 ACT.cgImprimir = function (el) { imprimirCarga(el.dataset.arg); };
 ACT.cgSaiu = function (el) {
   const c = FRT.cargas.find(function (x) { return x.id === el.dataset.arg; });
-  const veis = S.veiculos.filter(function (v) { return v.situacao !== 'Inativo'; }).map(function (v) { return { v: v.codigo + (v.placa ? ' · ' + v.placa : ''), t: v.codigo + ' ' + (v.marcaModelo || '') + (v.placa ? ' · ' + v.placa : '') }; });
-  modal({ title: 'Saída da carga', sub: esc(c.nome), body: '<p class="muted" style="margin-top:0">Os fretes ficam "em rota" e as máquinas, em trânsito, até a obra receber.</p><div class="grid2">' +
-      '<label class="field"><span>Motorista</span><input class="input" id="cg-mot" autofocus></label>' +
-      '<label class="field"><span>Veículo</span><select class="input" id="cg-vei">' + sel(veis.concat([{ v: 'Terceiro', t: 'Terceiro / outro' }]), '', 'Escolha') + '</select></label></div>',
+  modal({ title: 'Saída da carga', sub: esc(c.nome), body: '<p class="muted" style="margin-top:0">Os fretes ficam "em rota" e as máquinas, em trânsito, até a obra receber.</p>' + camposTransp(c, 'cg'),
     foot: '<button class="btn" data-act="fecharModal">Cancelar</button><button class="btn primary" id="cg-ok">' + ic('send') + 'Confirmar saída</button>' });
+  ligarTransp('cg');
   document.getElementById('cg-ok').onclick = function () {
-    acaoFreteTela('acaoCarga', [TOKEN, 'saiu', { id: c.id, motorista: document.getElementById('cg-mot').value, veiculo: document.getElementById('cg-vei').value }], function (r) { return plural(r.saiu, 'frete saiu', 'fretes saíram') + '.'; }).catch(function () { });
+    const t = lerTransp('cg', true); if (!t) return;
+    acaoFreteTela('acaoCarga', [TOKEN, 'saiu', Object.assign({ id: c.id }, t)], function (r) { return plural(r.saiu, 'frete saiu', 'fretes saíram') + '.'; }).catch(function () { });
   };
 };
 
@@ -3641,7 +3716,7 @@ function imprimirRomaneios(lista, carga) {
   const emp = esc(S.empresa || 'Turano Construtora');
   const logo = document.getElementById('img-mark').src;
   const resumo = carga && lista.length > 1 ? '<section class="rmn pg"><div class="rmn-top"><img src="' + logo + '" alt=""><div><div class="rmn-emp">' + emp + '</div><h1>Resumo da carga · ' + esc(carga.nome) + '</h1>' +
-      '<div class="rmn-sub">' + plural(lista.length, 'entrega', 'entregas') + ' · impresso em ' + new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + '</div></div></div>' +
+      '<div class="rmn-sub">' + (carga.veiculo ? esc(descTransp(carga, false)) + ' · ' : '') + plural(lista.length, 'entrega', 'entregas') + ' · impresso em ' + new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + '</div></div></div>' +
       '<table class="rmn-t"><thead><tr><th>#</th><th>Romaneio</th><th>Destino</th><th>O que vai</th><th>Urgência</th></tr></thead><tbody>' + lista.map(function (f, k) {
         return '<tr><td>' + (k + 1) + '</td><td class="mono">' + esc(f.romaneio) + '</td><td><b>' + esc(f.destinoNome) + '</b><div class="rmn-end">' + esc(enderecoDe(f.destino)) + '</div><div class="rmn-end">De: ' + esc(f.origemNome) + '</div></td><td>' + esc(itensFrete(f)) + '</td><td>' + esc(f.prioridade) + '</td></tr>';
       }).join('') + '</tbody></table>' +
@@ -3656,6 +3731,7 @@ function imprimirRomaneios(lista, carga) {
         return '<tr><td>' + i.n + '</td><td>' + (i.tag ? '<b class="mono">' + esc(i.tag) + '</b> ' + esc(m ? m.tipo : '') : esc(i.descricao)) + (i.tag && i.descricao ? '<div class="rmn-end">' + esc(i.descricao) + '</div>' : '') + '</td>' +
           '<td style="text-align:right;white-space:nowrap">' + numFmt(i.qtd) + ' ' + esc(i.unidade) + '</td><td class="rmn-conf">' + (i.tipo === 'Máquina' ? '☐ chegou &nbsp; ☐ completa' : 'recebido: ________') + '</td></tr>';
       }).join('') + '</tbody></table>' +
+      (f.veiculo || f.motorista ? '<div class="rmn-obs"><b>Transporte:</b> ' + esc(descTransp(f, false)) + '</div>' : '') +
       (f.obs ? '<div class="rmn-obs"><b>Observação:</b> ' + esc(f.obs) + '</div>' : '') +
       '<div class="rmn-ass"><div><span>Motorista</span><i></i><small>Assinatura</small></div>' +
         '<div><span>Recebido por</span><i></i><small>Nome</small><i></i><small>Data &nbsp;&nbsp;___/___/______ &nbsp;&nbsp;&nbsp; Assinatura</small></div></div>' +
@@ -3806,7 +3882,7 @@ function abrirFreteForm(pref) {
   if (!FRT || !FRT.configurado) return toast('O frete ainda não foi configurado (veja o LEIA-ME).', 'warn');
   const obra = S.usuario.obra;
   UI.ff = Object.assign({ itens: [], origem: {}, destino: obra ? { id: obra } : {}, tipoFrete: FRT.tipos.length === 1 ? FRT.tipos[0] : '', prioridade: 'Normal', data: '', dia: diaLocal(0), obs: '',
-    solicitadoPor: S.usuario.responsavel || S.usuario.nome, referencia: '' }, pref || {});
+    solicitadoPor: S.usuario.responsavel || S.usuario.nome, referencia: '', transp: {} }, pref || {});
   UI.ff.itens = (UI.ff.itens || []).map(function (i) { return Object.assign({ tipo: 'Máquina', tag: '', descricao: '', qtd: 1, unidade: 'un' }, i); });
   modal({ title: gestorFrete() ? 'Novo frete' : 'Pedir frete', sub: UI.ff.referencia ? 'Referente a ' + esc(UI.ff.referencia) : (gestorFrete() ? 'Entra aprovado no dia escolhido.' : 'Vai para aprovação do administrativo.'), wide: true,
     body: '<div id="ff-body">' + freteFormHtml() + '</div>',
@@ -3825,19 +3901,21 @@ function freteFormHtml() {
   const prios = FRT.prioridades;
   const tipos = FRT.tipos;
   const soMaterial = ff.tipoFrete === 'Combustível' || ff.tipoFrete === 'Compras' || ff.tipoFrete === 'Almoxarifado';
+  const doEstoque = ff.tipoFrete === 'Almoxarifado' && estAcesso();
   return '<div class="stack">' +
     '<div class="field"><span>Tipo de frete</span><div class="seg">' + tipos.map(function (t) { return '<button class="' + (ff.tipoFrete === t ? 'on' : '') + '" data-act="ffTipo" data-arg="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div>' +
       (ff.tipoFrete ? '<div class="small muted" style="margin-top:4px">' + esc(DICA_TIPO[ff.tipoFrete] || '') + '</div>' : '') + '</div>' +
     '<div><h3 style="margin-bottom:8px">O que vai</h3>' +
       (soMaterial ? '' : '<div class="scan-wrap">' + ic('scan') + '<input class="scan" data-scan="frm" placeholder="Bipe a TAG da máquina" autocomplete="off" spellcheck="false"></div>') +
-      '<div class="row wrap" style="gap:6px;margin-top:8px"><button class="btn sm" data-act="ffMaterial">' + ic('plus', 'ic-sm') + (ff.tipoFrete === 'Combustível' ? 'Combustível' : 'Material') + '</button>' +
+      (doEstoque ? buscaMatFrete() : '') +
+      '<div class="row wrap" style="gap:6px;margin-top:8px"' + (doEstoque ? ' hidden' : '') + '><button class="btn sm" data-act="ffMaterial">' + ic('plus', 'ic-sm') + (ff.tipoFrete === 'Combustível' ? 'Combustível' : 'Material') + '</button>' +
         (soMaterial ? '' : '<button class="btn sm ghost" data-act="ffMaqTexto">' + ic('plus', 'ic-sm') + 'Máquina sem TAG (locada)</button>') + '</div>' +
       (ff.itens.length ? '<div class="card" style="box-shadow:none;margin-top:10px"><div class="list">' + ff.itens.map(function (i, k) {
         const m = i.tag ? IDX.maq[i.tag] : null;
         return '<div class="li">' + (i.tipo === 'Máquina' && i.tag ? '<span class="tag">' + esc(i.tag) + '</span><div class="grow t">' + esc(m ? m.tipo : '') + '</div>' :
           i.tipo === 'Máquina' ? '<span class="chip info">Máquina</span><input class="input grow" data-in="ffItem" data-arg="' + k + ':descricao" value="' + esc(i.descricao) + '" placeholder="Descrição / contrato">' :
           '<span class="chip">' + (ff.tipoFrete === 'Combustível' ? 'Comb.' : 'Material') + '</span>' +
-            (ff.tipoFrete === 'Almoxarifado' && EST ? matSelect(k, i.matId) : '<input class="input grow" data-in="ffItem" data-arg="' + k + ':descricao" value="' + esc(i.descricao) + '" placeholder="' + (ff.tipoFrete === 'Combustível' ? 'Ex.: diesel S10' : 'Ex.: cimento CP-II') + '">') +
+            (i.matId ? linhaMatFrete(i) : '<input class="input grow" data-in="ffItem" data-arg="' + k + ':descricao" value="' + esc(i.descricao) + '" placeholder="' + (ff.tipoFrete === 'Combustível' ? 'Ex.: diesel S10' : 'Ex.: cimento CP-II') + '">') +
             '<input class="input" style="width:80px" data-in="ffItem" data-arg="' + k + ':qtd" value="' + esc(i.qtd) + '" inputmode="decimal" aria-label="Quantidade"><input class="input" style="width:70px" data-in="ffItem" data-arg="' + k + ':unidade" value="' + esc(i.unidade) + '" aria-label="Unidade">') +
           '<button class="btn ghost icon" data-act="ffTirar" data-arg="' + k + '" aria-label="Tirar">' + ic('x') + '</button></div>';
       }).join('') + '</div></div>' : '') + '</div>' +
@@ -3846,20 +3924,38 @@ function freteFormHtml() {
       return '<button class="prio ' + (ff.prioridade === p.nome ? 'on ' : '') + (COR_PRIO[p.nome] || '') + '" data-act="ffPrio" data-arg="' + esc(p.nome) + '"><b>' + esc(p.nome) + '</b><span>' + (p.horas ? p.horas + ' horas' : 'data marcada') + '</span></button>';
     }).join('') + '</div></div>' +
     (ff.prioridade === 'Agendado' ? '<label class="field"><span>Data</span><input class="input" type="datetime-local" data-in="ff" data-arg="data" value="' + esc(ff.data) + '"></label>' : '') +
-    (gestorFrete() ? '<label class="field"><span>Dia do frete (quadro)</span><select class="input" data-in="ff" data-arg="dia">' + opcoesDia(ff.dia) + '</select></label>' : '') +
+    (gestorFrete() ? '<label class="field"><span>Dia do frete (quadro)</span><select class="input" data-in="ff" data-arg="dia">' + opcoesDia(ff.dia) + '</select></label>' +
+      '<div><h3 style="margin-bottom:8px">Transporte</h3><p class="small muted" style="margin:-4px 0 8px">Opcional agora. Se o frete for numa carga, o veículo da carga vale na saída.</p>' + camposTransp(ff.transp, 'fft', 'ffT') + '</div>' : '') +
     '<div class="grid2"><label class="field"><span>Solicitado por</span><input class="input" data-in="ff" data-arg="solicitadoPor" value="' + esc(ff.solicitadoPor) + '"></label>' +
       '<label class="field"><span>Referência (OS, solicitação, pedido)</span><input class="input" data-in="ff" data-arg="referencia" value="' + esc(ff.referencia) + '"></label></div>' +
     '<label class="field"><span>Observação</span><textarea class="input" data-in="ff" data-arg="obs" placeholder="Ex.: falar com o almoxarife; precisa de munck">' + esc(ff.obs) + '</textarea></label></div>';
 }
-// Seletor de material do estoque (almoxarifado): lista ativos com o disponível; usados aparecem como "(usado)"
-function matSelect(k, atual) {
-  const mats = EST.materiais.filter(function (m) { return m.ativo !== false; });
-  return '<select class="input grow" data-in="ffMat" data-arg="' + k + '" aria-label="Material do estoque">' +
-    '<option value="">Escolha o material…</option>' + mats.map(function (m) {
-      return '<option value="' + esc(m.id) + '"' + (String(atual) === String(m.id) ? ' selected' : '') + '>' + esc(nomeMat(m)) + ' · ' + esc(m.c) + ' · disponível ' + m.disp + ' ' + esc(m.u) + '</option>';
-    }).join('') + '</select>';
+// Busca de material do estoque no frete do almoxarifado (mesmo jeito do Novo pedido de material)
+function buscaMatFrete() {
+  const ff = UI.ff, q = (ff.q || '').trim().toLowerCase();
+  const ja = {}; ff.itens.forEach(function (i) { if (i.matId) ja[i.matId] = true; });
+  const achados = q.length >= 2 ? EST.materiais.filter(function (m) { return m.ativo !== false && !ja[m.id] && (nomeMat(m) + ' ' + m.c + ' ' + m.id).toLowerCase().indexOf(q) >= 0; }).slice(0, 8) : [];
+  return '<div class="search" style="max-width:none">' + ic('search') + '<input class="input" id="ff-q" placeholder="Digite parte do nome do material" data-in="ffQ" value="' + esc(ff.q || '') + '" autocomplete="off"></div>' +
+    (achados.length ? '<div class="card" style="box-shadow:none;margin-top:6px"><div class="list">' + achados.map(function (m) {
+      return '<div class="li click" data-act="ffAddMat" data-arg="' + esc(m.id) + '">' + ic('plus') + '<div class="grow"><div class="t">' + esc(nomeMat(m)) + '</div><div class="small muted">' + esc(m.c) + '</div></div><span class="chip' + (m.disp > 0 ? '' : ' bad') + '">' + numFmt(m.disp) + ' ' + esc(m.u) + ' disponível</span></div>';
+    }).join('') + '</div></div>' : q.length >= 2 ? '<div class="small muted" style="margin-top:6px">Nenhum material encontrado.</div>' : '');
 }
-function redesenharFF() { const b = document.getElementById('ff-body'); if (b) b.innerHTML = freteFormHtml(); }
+function linhaMatFrete(i) {
+  const m = matDe(i.matId);
+  return '<div class="grow"><div class="t">' + esc(m ? nomeMat(m) : i.descricao) + '</div>' + (m ? '<div class="small' + (numBR(i.qtd) > m.disp ? '" style="color:var(--bad)' : ' muted') + '">disponível ' + numFmt(m.disp) + ' ' + esc(m.u) + '</div>' : '') + '</div>';
+}
+function redesenharFF(foco) {
+  const b = document.getElementById('ff-body'); if (!b) return;
+  b.innerHTML = freteFormHtml();
+  if (foco) { const i = document.getElementById('ff-q'); if (i) { i.focus(); const n = i.value.length; try { i.setSelectionRange(n, n); } catch (e) { } } }
+}
+IN.ffT = function (el, a, change) { UI.ff.transp = UI.ff.transp || {}; UI.ff.transp[a] = el.value; if (a === 'veiculo' && change) redesenharFF(); };
+IN.ffQ = function (el) { UI.ff.q = el.value; clearTimeout(tBusca); tBusca = setTimeout(function () { redesenharFF(true); }, 150); };
+ACT.ffAddMat = function (el) {
+  const m = matDe(el.dataset.arg); if (!m) return;
+  UI.ff.itens.push({ tipo: 'Material', tag: '', matId: m.id, descricao: nomeMat(m), qtd: '', unidade: m.u });
+  UI.ff.q = ''; redesenharFF(true);
+};
 SCAN.frm = function (tag, input) {
   if (UI.ff.itens.some(function (i) { return i.tag === tag; })) { bip('warn'); flash(input, 'warn'); return toast(tag + ' já está no pedido.', 'warn'); }
   const m = IDX.maq[tag];
@@ -3882,10 +3978,16 @@ ACT.ffEnviar = function () {
   if (!ff.origem.id && !(ff.origem.texto || '').trim()) return toast('Informe a origem do frete.', 'warn');
   if (!ff.destino.id && !(ff.destino.texto || '').trim()) return toast('Informe o destino do frete.', 'warn');
   if (ff.prioridade === 'Agendado' && !ff.data) return toast('Informe a data agendada.', 'warn');
-  if (ff.tipoFrete === 'Almoxarifado' && ff.itens.some(function (i) { return i.tipo === 'Material' && !i.matId; })) return toast('Escolha o material de cada linha.', 'warn');
+  if (ff.tipoFrete === 'Almoxarifado' && estAcesso() && ff.itens.some(function (i) { return i.tipo === 'Material' && !i.matId; })) return toast('Escolha o material na busca do estoque.', 'warn');
+  const semQtd = ff.itens.find(function (i) { return i.matId && !(numBR(i.qtd) > 0); });
+  if (semQtd) return toast('Informe a quantidade de ' + semQtd.descricao + '.', 'warn');
   const d = { itens: ff.itens.map(function (i) { return { tipo: i.tipo, tag: i.tag, matId: i.matId || '', descricao: i.descricao, qtd: numBR(i.qtd) || 1, unidade: i.unidade }; }),
     origem: ff.origem.id ? { id: ff.origem.id } : { texto: ff.origem.texto }, destino: ff.destino.id ? { id: ff.destino.id } : { texto: ff.destino.texto },
     tipoFrete: ff.tipoFrete, prioridade: ff.prioridade, data: ff.data, dia: ff.dia, obs: ff.obs, solicitadoPor: ff.solicitadoPor, referencia: ff.referencia };
+  if (gestorFrete()) {
+    const t = lerTransp('fft', false); if (!t) return;
+    if (t.veiculo || t.motorista || t.valor !== '') d.transporte = t;
+  }
   chamar('criarFrete', [TOKEN, d]).then(function (r) {
     fecharModal(); aplicarFrete(r.frt); toast(gestorFrete() ? 'Frete ' + r.id + ' criado.' : 'Pedido ' + r.id + ' enviado para aprovação.');
   }).catch(function () { });
@@ -4111,6 +4213,11 @@ ACT.epEnviar = function () {
   const desc = e.tipo + ' · ' + (e.origem === 'Fornecedor' ? ((EST.fornecedores || []).find(function (f) { return f.id === e.fornecedor; }) || {}).nome : locNome(e.local)) + ' · ' + plural(e.itens.length, 'material', 'materiais');
   chamarOuGuardar('criarPedidoMat', [TOKEN, d], { desc: desc, ok: 'Pedido de material enviado' }).then(function (r) {
     fecharModal(); UI.ep = null;
+    if (e.doCarrinho) {
+      // tira só o que foi pedido (o que a pessoa removeu do formulário continua no carrinho)
+      const foi = {}; d.itens.forEach(function (i) { foi[i.material] = true; });
+      salvarCarrinho(carrinho().filter(function (c) { return !foi[c.material]; }));
+    }
     if (r.fila) { render(); return toast('Sem internet: pedido guardado. Será enviado quando a conexão voltar.', 'warn'); }
     aplicarEstoque(r.est); toast('Pedido ' + r.id + (gestorMat() && d.etapa !== 'pendente' ? ' registrado.' : ' enviado para aprovação.'));
   }).catch(function () { });
@@ -4130,16 +4237,26 @@ VIEWS.estSaldo = function () {
     return !q || (nomeMat(m) + ' ' + m.c + ' ' + m.id).toLowerCase().indexOf(q) >= 0;
   });
   return '<div class="page-h"><div><h1>Estoque</h1><p>' + (g ? 'Físico é o que está no almoxarifado. Disponível desconta o que já está reservado para retirada.' : 'Quanto há disponível de cada material no almoxarifado.') + '</p></div>' +
-      '<div class="row wrap">' + (g ? '<button class="btn" data-act="esImprimir">' + ic('print') + 'Imprimir posição</button><button class="btn primary" data-act="esNovo">' + ic('plus') + 'Novo material</button>' : '') + '</div></div>' +
+      '<div class="row wrap"><button class="btn" data-act="ir" data-arg="estCarrinho">' + ic('cart') + 'Carrinho' + (carrinho().length ? ' (' + carrinho().length + ')' : '') + '</button>' + (g ? '<button class="btn" data-act="esImprimir">' + ic('print') + 'Imprimir posição</button><button class="btn primary" data-act="esNovo">' + ic('plus') + 'Novo material</button>' : '') + '</div></div>' +
     '<div class="toolbar"><div class="search">' + ic('search') + '<input class="input" placeholder="Buscar material" data-in="esF" data-arg="q" value="' + esc(f.q) + '"></div>' +
       '<select class="input" data-in="esF" data-arg="cat" aria-label="Categoria">' + sel(cats, f.cat, 'Todas as categorias') + '</select>' +
       '<select class="input" data-in="esF" data-arg="so" aria-label="Mostrar">' + sel([{ v: '', t: 'Todos ativos' }, { v: 'saldo', t: 'Só com saldo' }].concat(g ? [{ v: 'ocultos', t: 'Ocultos' }] : []), f.so) + '</select></div>' +
-    '<div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Material</th><th>Categoria</th>' + (g ? '<th style="text-align:right">Físico</th><th style="text-align:right">A retirar</th><th style="text-align:right">A entrar</th>' : '') +
-      '<th style="text-align:right">Disponível</th></tr></thead><tbody>' + (lista.length ? lista.slice(0, UI.esLim || 300).map(function (m) {
+    // no celular vira lista, com o botão do carrinho sempre à vista
+    '<div class="card so-cel"><div class="list">' + (lista.length ? lista.slice(0, UI.esLim || 300).map(function (m) {
+      const noCar = carrinho().find(function (c) { return c.material === m.id; });
+      return '<div class="li"' + (g ? ' data-act="esAbrir" data-arg="' + esc(m.id) + '"' : '') + '><div class="grow"><div class="t">' + esc(nomeMat(m)) + '</div><div class="small muted">' + esc(m.c) +
+          (g ? ' · físico ' + numFmt(m.fis) + (m.aRet ? ' · a retirar ' + numFmt(m.aRet) : '') : '') + '</div></div>' +
+        '<span class="chip' + (m.disp > 0 ? '' : ' bad') + '">' + numFmt(m.disp) + ' ' + esc(m.u) + ' disponível</span>' +
+        (m.ativo === false ? '' : '<div class="acoes"><button class="btn sm' + (noCar ? '' : ' ghost') + '" data-act="carAdd" data-arg="' + esc(m.id) + '">' + ic('cart', 'ic-sm') + (noCar ? numFmt(noCar.qtd) + ' no carrinho' : 'Colocar no carrinho') + '</button></div>') + '</div>';
+    }).join('') : '<div class="empty">Nenhum material.</div>') + '</div></div>' +
+    '<div class="card so-desk"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Material</th><th>Categoria</th>' + (g ? '<th style="text-align:right">Físico</th><th style="text-align:right">A retirar</th><th style="text-align:right">A entrar</th>' : '') +
+      '<th style="text-align:right">Disponível</th><th><span class="sr-only">Carrinho</span></th></tr></thead><tbody>' + (lista.length ? lista.slice(0, UI.esLim || 300).map(function (m) {
+        const noCar = carrinho().find(function (c) { return c.material === m.id; });
         return '<tr' + (g ? ' data-act="esAbrir" data-arg="' + esc(m.id) + '"' : '') + '><td><b>' + esc(nomeMat(m)) + '</b> <span class="small faint mono">' + esc(m.id) + '</span></td><td>' + esc(m.c) + '</td>' +
           (g ? '<td style="text-align:right">' + numFmt(m.fis) + '</td><td style="text-align:right">' + (m.aRet ? numFmt(m.aRet) : '—') + '</td><td style="text-align:right">' + (m.aEnt ? numFmt(m.aEnt) : '—') + '</td>' : '') +
-          '<td style="text-align:right"><b' + (m.disp > 0 ? '' : ' style="color:var(--bad)"') + '>' + numFmt(m.disp) + '</b> ' + esc(m.u) + '</td></tr>';
-      }).join('') : '<tr><td colspan="6"><div class="empty">Nenhum material.</div></td></tr>') + '</tbody></table></div></div>';
+          '<td style="text-align:right"><b' + (m.disp > 0 ? '' : ' style="color:var(--bad)"') + '>' + numFmt(m.disp) + '</b> ' + esc(m.u) + '</td>' +
+          '<td style="text-align:right;white-space:nowrap">' + (m.ativo === false ? '' : '<button class="btn sm' + (noCar ? '' : ' ghost') + '" data-act="carAdd" data-arg="' + esc(m.id) + '" aria-label="Colocar ' + esc(nomeMat(m)) + ' no carrinho">' + ic('cart', 'ic-sm') + (noCar ? numFmt(noCar.qtd) + ' no carrinho' : 'Colocar no carrinho') + '</button>') + '</td></tr>';
+      }).join('') : '<tr><td colspan="7"><div class="empty">Nenhum material.</div></td></tr>') + '</tbody></table></div></div>';
 };
 function unicosTxt(l) { const v = {}; return l.filter(function (x) { if (!x || v[x]) return false; v[x] = 1; return true; }).sort(function (a, b) { return a.localeCompare(b); }); }
 IN.esF = function (el, a, change) {
@@ -4147,6 +4264,72 @@ IN.esF = function (el, a, change) {
   if (el.tagName === 'SELECT') return render();
   clearTimeout(tBusca); tBusca = setTimeout(function () { const pos = el.selectionStart; render(); const n = document.querySelector('[data-in="esF"][data-arg="q"]'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) { } } }, 200);
 };
+// ---------- Carrinho ----------
+// Separação organizacional, guardada só neste aparelho e por login. Não reserva nada no estoque:
+// o material só fica reservado quando o pedido gerado a partir do carrinho for aprovado.
+function chaveCarrinho() { return 'cm_carrinho_' + meuLogin(); }
+function carrinho() { try { const c = ls(chaveCarrinho()); return Array.isArray(c) ? c : []; } catch (e) { return []; } }
+function salvarCarrinho(c) { try { ls(chaveCarrinho(), c.length ? c : null); } catch (e) { } if (S) montarCasca(); }
+ACT.carAdd = function (el) {
+  const m = matDe(el.dataset.arg); if (!m) return;
+  const ja = carrinho().find(function (c) { return c.material === m.id; });
+  modal({ title: esc(nomeMat(m)), sub: esc(m.c) + ' · disponível ' + numFmt(m.disp) + ' ' + esc(m.u),
+    body: '<label class="field"><span>Quantidade (' + esc(m.u) + ')</span><input class="input" id="car-q" inputmode="numeric" value="' + (ja ? ja.qtd : 1) + '"></label>' +
+      '<p class="small muted" style="margin:8px 0 0">O carrinho só organiza o que você pretende pedir. Nada fica reservado no estoque até o pedido ser aprovado.</p>',
+    foot: (ja ? '<button class="btn ghost" data-act="carTirar" data-arg="' + esc(m.id) + '">Tirar do carrinho</button>' : '') + '<button class="btn" data-act="fecharModal">Cancelar</button><button class="btn primary" data-act="carOk" data-arg="' + esc(m.id) + '">' + ic('cart') + (ja ? 'Atualizar' : 'Colocar no carrinho') + '</button>' });
+  const i = document.getElementById('car-q'); if (i) { i.focus(); i.select(); i.onkeydown = function (ev) { if (ev.key === 'Enter') ACT.carOk({ dataset: { arg: m.id } }); }; }
+};
+ACT.carOk = function (el) {
+  const m = matDe(el.dataset.arg); if (!m) return;
+  const q = numBR(document.getElementById('car-q').value);
+  if (!(q > 0) || Math.floor(q) !== q) return toast('Informe a quantidade (número inteiro).', 'warn');
+  const c = carrinho(), ja = c.find(function (x) { return x.material === m.id; });
+  if (ja) ja.qtd = q; else c.push({ material: m.id, qtd: q, sel: true });
+  salvarCarrinho(c); fecharModal(); render();
+  toast(numFmt(q) + ' ' + m.u + ' de ' + nomeMat(m) + ' no carrinho' + (q > m.disp ? ' (acima do disponível hoje)' : '') + '.', q > m.disp ? 'warn' : undefined);
+};
+ACT.carTirar = function (el) { salvarCarrinho(carrinho().filter(function (c) { return c.material !== el.dataset.arg; })); fecharModal(); render(); };
+ACT.carEsvaziar = function () {
+  modal({ title: 'Esvaziar o carrinho?', body: '<p style="margin:0">Os ' + plural(carrinho().length, 'material sai', 'materiais saem') + ' do carrinho. Nenhum pedido é afetado.</p>',
+    foot: '<button class="btn" data-act="fecharModal">Voltar</button><button class="btn danger" data-act="carEsvaziarOk">Esvaziar</button>' });
+};
+ACT.carEsvaziarOk = function () { salvarCarrinho([]); fecharModal(); render(); toast('Carrinho vazio.'); };
+IN.carQtd = function (el, a) { const c = carrinho(), it = c.find(function (x) { return x.material === a; }); if (!it) return; it.qtd = el.value; salvarCarrinho(c); const m = matDe(a), av = document.getElementById('car-av-' + a); if (av && m) av.hidden = !(numBR(el.value) > m.disp); };
+IN.carSel = function (el, a, change) { if (!change) return; const c = carrinho(), it = c.find(function (x) { return x.material === a; }); if (it) it.sel = el.checked; salvarCarrinho(c); render(); };
+ACT.carTodos = function (el) { const v = el.dataset.arg === '1'; const c = carrinho(); c.forEach(function (x) { x.sel = v; }); salvarCarrinho(c); render(); };
+VIEWS.estCarrinho = function () {
+  const x = semEstoque('Carrinho'); if (x) return x;
+  const c = carrinho();
+  const sel = c.filter(function (i) { return i.sel !== false && matDe(i.material); });
+  const topo = '<div class="page-h"><div><h1>Carrinho</h1><p>Separe o que pretende pedir e gere o pedido quando quiser. Nada fica reservado no estoque até o pedido ser aprovado.</p></div>' +
+    '<button class="btn" data-act="ir" data-arg="estSaldo">' + ic('search') + 'Procurar material</button></div>';
+  if (!c.length) return topo + '<div class="card"><div class="empty">O carrinho está vazio.<br>Em Estoque, procure o material e toque em <b>Colocar no carrinho</b>.</div></div>';
+  return topo +
+    '<div class="card"><div class="card-h"><h2>' + plural(c.length, 'material', 'materiais') + '</h2><div class="row" style="gap:6px">' +
+      '<button class="btn sm ghost" data-act="carTodos" data-arg="' + (sel.length === c.length ? '0' : '1') + '">' + (sel.length === c.length ? 'Desmarcar todos' : 'Marcar todos') + '</button>' +
+      '<button class="btn sm ghost" data-act="carEsvaziar">Esvaziar</button></div></div><div class="list">' + c.map(function (i) {
+      const m = matDe(i.material);
+      if (!m) return '<div class="li"><div class="grow"><div class="t">' + esc(i.material) + '</div><div class="small" style="color:var(--bad)">Material não existe mais no estoque.</div></div><button class="btn ghost icon" data-act="carTirar" data-arg="' + esc(i.material) + '" aria-label="Tirar">' + ic('x') + '</button></div>';
+      const acima = numBR(i.qtd) > m.disp;
+      return '<div class="li car-li"><label class="check" style="margin:0"><input type="checkbox" data-in="carSel" data-arg="' + esc(m.id) + '"' + (i.sel !== false ? ' checked' : '') + ' aria-label="Incluir ' + esc(nomeMat(m)) + ' no pedido"></label>' +
+        '<div class="grow"><div class="t">' + esc(nomeMat(m)) + '</div><div class="small muted">' + esc(m.c) + ' · disponível ' + numFmt(m.disp) + ' ' + esc(m.u) + '</div>' +
+          '<div class="small" id="car-av-' + esc(m.id) + '" style="color:var(--bad)"' + (acima ? '' : ' hidden') + '>Acima do disponível hoje</div></div>' +
+        '<input class="input car-q" style="width:90px" inputmode="numeric" data-in="carQtd" data-arg="' + esc(m.id) + '" value="' + esc(i.qtd) + '" aria-label="Quantidade de ' + esc(nomeMat(m)) + '"><span class="small" style="width:34px">' + esc(m.u) + '</span>' +
+        '<button class="btn ghost icon" data-act="carTirar" data-arg="' + esc(m.id) + '" aria-label="Tirar ' + esc(nomeMat(m)) + ' do carrinho">' + ic('x') + '</button></div>';
+    }).join('') + '</div>' +
+    '<div class="card-b row wrap" style="justify-content:flex-end;gap:8px;border-top:1px solid var(--line)"><span class="small muted grow">' + plural(sel.length, 'marcado', 'marcados') + ' para o pedido</span>' +
+      '<button class="btn primary" data-act="carPedido"' + (sel.length ? '' : ' disabled') + '>' + ic('check') + 'Gerar pedido</button></div></div>';
+};
+ACT.carPedido = function () {
+  const sel = carrinho().filter(function (i) { return i.sel !== false && matDe(i.material); });
+  if (!sel.length) return toast('Marque ao menos um material.', 'warn');
+  for (let k = 0; k < sel.length; k++) { const q = numBR(sel[k].qtd); if (!(q > 0) || Math.floor(q) !== q) return toast('Quantidade inválida em ' + nomeMat(matDe(sel[k].material)) + '.', 'warn'); }
+  ACT.epNovo();
+  UI.ep.itens = sel.map(function (i) { return { material: i.material, qtd: String(numBR(i.qtd)) }; });
+  UI.ep.doCarrinho = sel.map(function (i) { return i.material; });
+  redesenharEP();
+};
+
 ACT.esAbrir = function (el) {
   const m = matDe(el.dataset.arg);
   modal({ title: esc(nomeMat(m)), sub: esc(m.c) + ' · <span class="mono">' + esc(m.id) + '</span>', body:
@@ -4996,7 +5179,6 @@ function inputMudou(el, change) {
   if (k === 'cand') { UI.cand.q = el.value; clearTimeout(tBusca); tBusca = setTimeout(redesenharCand, 180); return; }
   if (k === 'ff') { UI.ff[a] = el.value; return; }
   if (k === 'ffItem') { const p = a.split(':'); if (UI.ff.itens[+p[0]]) UI.ff.itens[+p[0]][p[1]] = el.value; return; }
-  if (k === 'ffMat') { const it = UI.ff.itens[+a]; if (!it) return; const m = matDe(el.value); it.matId = m ? m.id : ''; it.descricao = m ? nomeMat(m) : ''; it.unidade = m ? m.u : 'un'; if (change) redesenharFF(); return; }
   if (k === 'ffPonto') { if (!change) return; UI.ff[a] = el.value === '@outro' ? { texto: '' } : el.value ? { id: el.value } : {}; redesenharFF(); return; }
   if (k === 'ffTexto') { UI.ff[a] = { texto: el.value }; return; }
   if (k === 'tpQ') { UI.tpQ = el.value; clearTimeout(tBusca); tBusca = setTimeout(function () { const pos = el.selectionStart; render(); const n = document.querySelector('[data-in="tpQ"]'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) { } } }, 180); return; }
